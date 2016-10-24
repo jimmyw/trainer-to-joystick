@@ -60,9 +60,6 @@ void fall() {
   // This is the timeout, that marks the the tx is starting from channel 0 again.
   if (count > 10000) {
     channel = 0;
-
-    // Send the values to the pc.
-    joySend();
   } else {
     // The minimum pulse with is always 700 ticks, (Range 700 -> 1500)
     // Cut out the 700 first ticks, and cap the value to bee between 0 -> 800, with 400 as center stick.
@@ -72,6 +69,10 @@ void fall() {
       channels[channel] = count - 700;
     else
       channels[channel] = 0;
+
+    // Send joy moment directly after channel[3] is assigned to make lowest latency.
+    if (channel == 3)
+      joySend(); // Not sure how sending joystick from an interrupt will collide with timers if interrupts are disabled.
 
     // Next fall triggered shoud apply to next channel
     channel++;
